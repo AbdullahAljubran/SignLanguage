@@ -146,10 +146,15 @@ torchvision
 ## 👥 Team members
 
 This project was developed by a team of five students:
+
 Shaden Alturki
+
 Abdullah Aljubran
+
 Jana Almalki
+
 Shahad Albalawi
+
 Raghad Alqahtani
 
 
