@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كشف لغة الإشارة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            color: white;
+            padding: 15px 30px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            min-height: 80px;
+        }
+        
+        .logo {
+            width: 120px;
+            height: 120px;
+            background: url('static/LOGO.png') no-repeat center center;
+            background-size: contain;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.1);
+            padding: 10px;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .video-section {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .section-title {
+            font-size: 1.3em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .video-container {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 50vw;
+            margin: 0 auto;
+        }
+        
+        #videoFeed {
+            width: 50vw;
+            height: 640px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .camera-controls {
+            background: #f8f9fa;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .detection-section {
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            gap: 15px;
+        }
+        
+        .detection-display {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            min-height: 80px;
+        }
+        
+        .detection-display.has-detection {
+            background: linear-gradient(45deg, #27ae60, #229954);
+            color: white;
+            border: 2px solid #1e8449;
+            box-shadow: 0 5px 20px rgba(39, 174, 96, 0.3);
+        }
+        
+        .detection-display.stable-detection {
+            background: linear-gradient(45deg, #27ae60, #229954);
+            color: white;
+            border: 2px solid #1e8449;
+            box-shadow: 0 5px 20px rgba(39, 174, 96, 0.3);
+        }
+        
+        .detection-text {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .detection-status {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .no-detection {
+            color: #666;
+            font-style: italic;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.9em;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            white-space: nowrap;
+        }
+        
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn.restart-btn {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+        }
+        
+        .countdown {
+            font-size: 1em;
+            color: #ff6b6b;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        .stable-pulse {
+            animation: stable-pulse 3s infinite;
+        }
+        
+        @keyframes stable-pulse {
+            0% { box-shadow: 0 5px 20px rgba(39, 174, 96, 0.3); }
+            50% { box-shadow: 0 8px 30px rgba(39, 174, 96, 0.5); }
+            100% { box-shadow: 0 5px 20px rgba(39, 174, 96, 0.3); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .compact-section {
+            margin-bottom: 10px;
+        }
+        
+        .compact-section h3 {
+            font-size: 1.1em;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        .compact-text {
+            font-size: 1.2em;
+        }
+        
+        .status-indicator {
+            font-size: 0.9em;
+            padding: 5px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .status-active {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+        }
+        
+        .status-error {
+            background: rgba(244, 67, 54, 0.1);
+            color: #f44336;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .header {
+                padding: 10px 20px;
+                min-height: 60px;
+            }
+            
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .logo {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .video-container {
+                max-width: 300px;
+            }
+            
+            #videoFeed {
+                width: 300px;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo"></div>
+        </div>
+        
+        <div class="content">
+            <div class="video-section">
+                <h2 class="section-title">📹 كاميرا مباشرة</h2>
+                <div class="video-container">
+                    <img id="videoFeed" src="{{ url_for('video_feed') }}" alt="Live Camera Feed" 
+                         onerror="handleCameraError()" onload="handleCameraLoad()">
+                    <div class="camera-controls">
+                        <div id="cameraStatus" class="status-indicator status-active">
+                            ✅ الكاميرا تعمل بشكل مستمر
+                        </div>
+                        <button id="restartCameraBtn" class="btn restart-btn" onclick="restartCamera()">
+                            🔄 إعادة تشغيل
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detection-section">
+                <div class="compact-section">
+                    <h3>🔍 الكلمة المكتشفة</h3>
+                    <div id="detectionDisplay" class="detection-display">
+                        <div id="detectionText" class="detection-text compact-text no-detection">
+                            في انتظار الكشف...
+                        </div>
+                        <div id="detectionStatus" class="detection-status">
+                            ضع يدك أمام الكاميرا
+                        </div>
+                    </div>
+                    <div id="countdown" class="countdown" style="display: none;"></div>
+                </div>
+
+                <div class="compact-section">
+                    <h3>📝 الجملة المكونة</h3>
+                    <div id="sentenceDisplay" class="detection-display">
+                        <div id="sentenceText" class="detection-text compact-text no-detection">
+                            لا توجد كلمات بعد...
+                        </div>
+                        <div id="wordCount" class="detection-status">
+                            عدد الكلمات: 0
+                        </div>
+                    </div>
+                </div>
+
+                <div class="compact-section">
+                    <h3>❓ السؤال المقترح</h3>
+                    <div id="questionDisplay" class="detection-display">
+                        <div id="questionText" class="detection-text compact-text no-detection">
+                            لم يتم تكوين سؤال...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="compact-section">
+                    <h3>💬 الإجابة</h3>
+                    <div id="answerDisplay" class="detection-display">
+                        <div id="answerText" class="detection-text compact-text no-detection">
+                            لا توجد إجابة...
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn" onclick="clearDetection()">🗑️ مسح الكلمة</button>
+                    <button class="btn" onclick="clearSentence()" style="background: linear-gradient(45deg, #e74c3c, #c0392b);">🧹 مسح الجملة</button>
+                    <button class="btn" onclick="removeLastWord()" style="background: linear-gradient(45deg, #f39c12, #e67e22);">⬅️ حذف آخر كلمة</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let countdownInterval;
+        let detectionCheckInterval;
+        
+        function updateDetection() {
+            fetch('/get_detection')
+                .then(response => response.json())
+                .then(data => {
+                    const display = document.getElementById('detectionDisplay');
+                    const text = document.getElementById('detectionText');
+                    const status = document.getElementById('detectionStatus');
+                    const sentenceDisplay = document.getElementById('sentenceDisplay');
+                    const sentenceText = document.getElementById('sentenceText');
+                    const wordCount = document.getElementById('wordCount');
+                    const cameraStatus = document.getElementById('cameraStatus');
+                    
+                    // Update camera status
+                    if (data.camera_status) {
+                        cameraStatus.textContent = '✅ الكاميرا تعمل بشكل مستمر';
+                        cameraStatus.className = 'status-indicator status-active';
+                    } else {
+                        cameraStatus.textContent = '❌ خطأ في الكاميرا';
+                        cameraStatus.className = 'status-indicator status-error';
+                    }
+                    
+                    // Update current detection
+                    if (data.detected_sign && data.detected_sign !== '') {
+                        display.classList.add('stable-detection', 'stable-pulse');
+                        text.textContent = data.detected_sign;
+                        text.classList.remove('no-detection');
+                        status.textContent = 'تم الكشف بنجاح! ✅';
+                        startCountdown();
+                    } else {
+                        display.classList.remove('stable-detection', 'stable-pulse');
+                        text.textContent = 'في انتظار الكشف...';
+                        text.classList.add('no-detection');
+                        status.textContent = 'ضع يدك أمام الكاميرا';
+                    }
+                    
+                    // Update sentence
+                    if (data.sentence && data.sentence.trim() !== '') {
+                        sentenceDisplay.classList.add('stable-detection', 'stable-pulse');
+                        sentenceText.textContent = data.sentence;
+                        sentenceText.classList.remove('no-detection');
+                        wordCount.textContent = `عدد الكلمات: ${data.word_count}`;
+                    } else {
+                        sentenceDisplay.classList.remove('stable-detection', 'stable-pulse');
+                        sentenceText.textContent = 'لا توجد كلمات بعد...';
+                        sentenceText.classList.add('no-detection');
+                        wordCount.textContent = 'عدد الكلمات: 0';
+                    }
+                    
+                    // Update question
+                    if (data.question && data.question.trim() !== "") {
+                        document.getElementById('questionDisplay').classList.add('stable-detection');
+                        document.getElementById('questionText').textContent = data.question;
+                        document.getElementById('questionText').classList.remove('no-detection');
+                    } else {
+                        document.getElementById('questionDisplay').classList.remove('stable-detection');
+                        document.getElementById('questionText').textContent = 'لم يتم تكوين سؤال...';
+                        document.getElementById('questionText').classList.add('no-detection');
+                    }
+
+                    // Update answer
+                    if (data.answer && data.answer.trim() !== "") {
+                        document.getElementById('answerDisplay').classList.add('stable-detection');
+                        document.getElementById('answerText').textContent = data.answer;
+                        document.getElementById('answerText').classList.remove('no-detection');
+                    } else {
+                        document.getElementById('answerDisplay').classList.remove('stable-detection');
+                        document.getElementById('answerText').textContent = 'لا توجد إجابة...';
+                        document.getElementById('answerText').classList.add('no-detection');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching detection:', error);
+                    const cameraStatus = document.getElementById('cameraStatus');
+                    cameraStatus.textContent = '❌ خطأ في الاتصال';
+                    cameraStatus.className = 'status-indicator status-error';
+                });
+        }
+        
+        function startCountdown() {
+            let seconds = 3;
+            const countdownElement = document.getElementById('countdown');
+            countdownElement.style.display = 'block';
+            
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            
+            countdownInterval = setInterval(() => {
+                countdownElement.textContent = `الكشف التالي خلال: ${seconds} ثانية`;
+                seconds--;
+                
+                if (seconds < 0) {
+                    clearInterval(countdownInterval);
+                    countdownElement.style.display = 'none';
+                }
+            }, 1000);
+        }
+        
+        function clearDetection() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+            
+            fetch('/clear_detection')
+                .then(response => response.json())
+                .then(() => {
+                    if (countdownInterval) clearInterval(countdownInterval);
+                    document.getElementById('countdown').style.display = 'none';
+                    updateDetection();
+                })
+                .catch(error => console.error('Error clearing detection:', error))
+                .finally(() => {
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                    }, 500);
+                });
+        }
+        
+        function clearSentence() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+            
+            fetch('/clear_sentence')
+                .then(response => response.json())
+                .then(() => {
+                    if (countdownInterval) clearInterval(countdownInterval);
+                    document.getElementById('countdown').style.display = 'none';
+                    updateDetection();
+                })
+                .catch(error => console.error('Error clearing sentence:', error))
+                .finally(() => {
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                    }, 500);
+                });
+        }
+        
+        function removeLastWord() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+            
+            fetch('/remove_last_word')
+                .then(response => response.json())
+                .then(() => updateDetection())
+                .catch(error => console.error('Error removing last word:', error))
+                .finally(() => {
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                    }, 500);
+                });
+        }
+        
+        function restartCamera() {
+            const btn = document.getElementById('restartCameraBtn');
+            const originalText = btn.textContent;
+            btn.textContent = '🔄 جاري...';
+            btn.disabled = true;
+            
+            fetch('/restart_camera')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'restarted') {
+                        const videoFeed = document.getElementById('videoFeed');
+                        videoFeed.src = videoFeed.src + '?' + new Date().getTime();
+                    }
+                    updateDetection();
+                })
+                .catch(error => console.error('Error restarting camera:', error))
+                .finally(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                });
+        }
+        
+        function handleCameraError() {
+            const cameraStatus = document.getElementById('cameraStatus');
+            cameraStatus.textContent = '❌ فشل في تحميل الكاميرا';
+            cameraStatus.className = 'status-indicator status-error';
+        }
+        
+        function handleCameraLoad() {
+            const cameraStatus = document.getElementById('cameraStatus');
+            cameraStatus.textContent = '✅ الكاميرا تعمل بشكل مستمر';
+            cameraStatus.className = 'status-indicator status-active';
+        }
+        
+        // Update detection every 300ms for faster response
+        detectionCheckInterval = setInterval(updateDetection, 300);
+        updateDetection();
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (countdownInterval) clearInterval(countdownInterval);
+            if (detectionCheckInterval) clearInterval(detectionCheckInterval);
+        });
+    </script>
+</body>
+</html>

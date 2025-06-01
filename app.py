@@ -11,7 +11,7 @@ import atexit
 app = Flask(__name__)
 
 # Load YOLO model
-model = YOLO("yolov11_run/weights/best.pt")
+model = YOLO("best.pt")
 
 # Translation dictionary (English to Arabic)
 translation_dict = {
