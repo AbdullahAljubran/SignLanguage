@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>كشف لغة الإشارة</title>
+    <title>كاشف لغة الإشارة</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
         
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            background: linear-gradient(135deg, #bbc6d1 0%, #2980b9 100%);
             height: 100vh;
             overflow: hidden;
         }
@@ -22,12 +22,12 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            background: white;
+            background: #e8f2f3;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
         
         .header {
-            background: linear-gradient(45deg, #2c3e50, #34495e);
+            background: linear-gradient(90deg, #00abb3, #b5e0e3, #00abb3);
             color: white;
             padding: 15px 30px;
             text-align: center;
@@ -35,17 +35,24 @@
             align-items: center;
             justify-content: center;
             gap: 20px;
-            min-height: 80px;
+            min-height: 200px;
         }
         
         .logo {
-            width: 120px;
-            height: 120px;
+            width: 200px;
+            height: 200px;
             background: url('static/LOGO.png') no-repeat center center;
             background-size: contain;
-            border-radius: 50%;
-            background-color: rgba(255,255,255,0.1);
-            padding: 10px;
+            background-color: transparent;
+            border-radius: 0;
+            margin-right: 10px;
+        }
+
+        .slogan {
+            font-size: 3em;
+            font-weight: bold;
+            color: #00676c;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
         }
         
         .header h1 {
@@ -66,25 +73,26 @@
         .video-section {
             display: flex;
             flex-direction: column;
+            align-items: center;
         }
         
         .section-title {
-            font-size: 1.3em;
+            font-size: 1.5em;
             color: #2c3e50;
             margin-bottom: 10px;
             text-align: center;
             font-weight: bold;
-        }
+        } 
         
         .video-container {
-            border-radius: 15px;
+            background: #f6f9fa;
+            border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            flex: 1;
             display: flex;
             flex-direction: column;
             width: 50vw;
-            margin: 0 auto;
+            margin-bottom: 20px;
         }
         
         #videoFeed {
@@ -92,16 +100,6 @@
             height: 640px;
             object-fit: cover;
             display: block;
-        }
-        
-        .camera-controls {
-            background: #f8f9fa;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
         }
         
         .detection-section {
@@ -113,9 +111,9 @@
         
         .detection-display {
             background: white;
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            padding: 10px;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -124,24 +122,17 @@
             transition: all 0.3s ease;
             border: 2px solid transparent;
             min-height: 80px;
-        }
-        
-        .detection-display.has-detection {
-            background: linear-gradient(45deg, #27ae60, #229954);
-            color: white;
-            border: 2px solid #1e8449;
-            box-shadow: 0 5px 20px rgba(39, 174, 96, 0.3);
+            width: 98%;
         }
         
         .detection-display.stable-detection {
-            background: linear-gradient(45deg, #27ae60, #229954);
-            color: white;
-            border: 2px solid #1e8449;
-            box-shadow: 0 5px 20px rgba(39, 174, 96, 0.3);
+            background: white;
+            color: #18747c;
+            box-shadow: 0 5px 20px rgba(37, 133, 142, 0.2); /* subtle matching shadow */
         }
         
         .detection-text {
-            font-size: 1.5em;
+            font-size: 1.8em;
             font-weight: bold;
             margin-bottom: 5px;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
@@ -149,13 +140,29 @@
         }
         
         .detection-status {
-            font-size: 0.9em;
-            opacity: 0.8;
+            font-size: 1.3em;
+            opacity: 0.9;
         }
         
         .no-detection {
             color: #666;
-            font-style: italic;
+            font-size: 1.3em;
+            font-weight: normal;
+            font-style: normal; /* Or italic if you want it italic */
+        }
+
+        .warning-message {
+            color: #666;
+            font-size: 2em;
+            font-weight: normal;
+            text-align: center;
+        }
+
+        #sentenceWarning.detection-status.no-detection {
+            color: #666666;
+            font-size: 32px;
+            text-align: center;
+            margin-top: 5px;
         }
         
         .controls {
@@ -167,16 +174,18 @@
         }
         
         .btn {
-            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
             color: white;
             border: none;
-            padding: 8px 16px;
-            font-size: 0.9em;
-            border-radius: 20px;
+            padding: 1rem 4rem;       
+            font-size: 1.5rem;       
+            border-radius: 100px;
+            min-width: 300px;       
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 3px 10px rgba(0,0,0,0.2);
             white-space: nowrap;
+            position: relative;
+            overflow: hidden;
         }
         
         .btn:hover:not(:disabled) {
@@ -190,8 +199,37 @@
             transform: none;
         }
         
-        .btn.restart-btn {
-            background: linear-gradient(45deg, #3498db, #2980b9);
+        .btn.loading {
+            pointer-events: none;
+        }
+        
+        .btn.loading::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .btn.toggle-btn {
+            background: linear-gradient(1550deg, #27ae60, #2cbe69, #27ae60 );
+            font-size: 2rem;         
+            padding: 1rem 2rem;      
+            min-width: 220px;             
+            border-radius: 100px;        
+            text-align: center;
+        }
+
+        .btn.toggle-btn.off {
+            background: linear-gradient(1550deg, #de2828, #ef3636, #de2828);
         }
         
         .countdown {
@@ -199,16 +237,6 @@
             color: #ff6b6b;
             margin-top: 10px;
             font-weight: bold;
-        }
-        
-        .stable-pulse {
-            animation: stable-pulse 3s infinite;
-        }
-        
-        @keyframes stable-pulse {
-            0% { box-shadow: 0 5px 20px rgba(39, 174, 96, 0.3); }
-            50% { box-shadow: 0 8px 30px rgba(39, 174, 96, 0.5); }
-            100% { box-shadow: 0 5px 20px rgba(39, 174, 96, 0.3); }
         }
         
         .fade-in {
@@ -225,31 +253,14 @@
         }
         
         .compact-section h3 {
-            font-size: 1.1em;
+            font-size: 1.5em;
             color: #2c3e50;
             margin-bottom: 8px;
             text-align: center;
         }
         
         .compact-text {
-            font-size: 1.2em;
-        }
-        
-        .status-indicator {
-            font-size: 0.9em;
-            padding: 5px;
-            border-radius: 5px;
-            text-align: center;
-        }
-        
-        .status-active {
-            background: rgba(39, 174, 96, 0.1);
-            color: #27ae60;
-        }
-        
-        .status-error {
-            background: rgba(244, 67, 54, 0.1);
-            color: #f44336;
+            font-size: 2em;
         }
         
         @media (max-width: 768px) {
@@ -288,73 +299,65 @@
     <div class="container">
         <div class="header">
             <div class="logo"></div>
+            <div class="slogan">لأن التواصل حق الجميع</div>
         </div>
         
         <div class="content">
             <div class="video-section">
-                <h2 class="section-title">📹 كاميرا مباشرة</h2>
                 <div class="video-container">
                     <img id="videoFeed" src="{{ url_for('video_feed') }}" alt="Live Camera Feed" 
                          onerror="handleCameraError()" onload="handleCameraLoad()">
-                    <div class="camera-controls">
-                        <div id="cameraStatus" class="status-indicator status-active">
-                            ✅ الكاميرا تعمل بشكل مستمر
-                        </div>
-                        <button id="restartCameraBtn" class="btn restart-btn" onclick="restartCamera()">
-                            🔄 إعادة تشغيل
-                        </button>
-                    </div>
                 </div>
+                
+                <button id="toggleDetectionBtn" class="btn toggle-btn off" onclick="toggleDetection()">
+                    تشغيل الكشف 🔍
+                </button>
             </div>
             
             <div class="detection-section">
                 <div class="compact-section">
-                    <h3>🔍 الكلمة المكتشفة</h3>
+                    <h3> الكلمة المكتشفة </h3>
                     <div id="detectionDisplay" class="detection-display">
                         <div id="detectionText" class="detection-text compact-text no-detection">
-                            في انتظار الكشف...
+                            في انتظار تشغيل الكشف
                         </div>
-                        <div id="detectionStatus" class="detection-status">
-                            ضع يدك أمام الكاميرا
-                        </div>
+                        <div id="detectionStatusText" class="detection-status"></div>
                     </div>
                     <div id="countdown" class="countdown" style="display: none;"></div>
                 </div>
 
                 <div class="compact-section">
-                    <h3>📝 الجملة المكونة</h3>
+                    <h3> الجملة المكونة </h3>
                     <div id="sentenceDisplay" class="detection-display">
                         <div id="sentenceText" class="detection-text compact-text no-detection">
-                            لا توجد كلمات بعد...
-                        </div>
-                        <div id="wordCount" class="detection-status">
-                            عدد الكلمات: 0
+                        </div> 
+                        <div id="wordCount" class="detection-status"></div>
+                        <div id="sentenceWarning" class="detection-status no-detection">
+                            يجب أن لا يقل السؤال عن ثلاث كلمات
                         </div>
                     </div>
                 </div>
 
                 <div class="compact-section">
-                    <h3>❓ السؤال المقترح</h3>
+                    <h3> السؤال المقترح </h3>
                     <div id="questionDisplay" class="detection-display">
                         <div id="questionText" class="detection-text compact-text no-detection">
-                            لم يتم تكوين سؤال...
-                        </div>
+                        </div> 
                     </div>
                 </div>
 
                 <div class="compact-section">
-                    <h3>💬 الإجابة</h3>
+                    <h3> الإجابة </h3>
                     <div id="answerDisplay" class="detection-display">
-                        <div id="answerText" class="detection-text compact-text no-detection">
-                            لا توجد إجابة...
+                       <div id="answerText" class="detection-text compact-text no-detection">
                         </div>
                     </div>
                 </div>
                 
                 <div class="controls">
-                    <button class="btn" onclick="clearDetection()">🗑️ مسح الكلمة</button>
-                    <button class="btn" onclick="clearSentence()" style="background: linear-gradient(45deg, #e74c3c, #c0392b);">🧹 مسح الجملة</button>
-                    <button class="btn" onclick="removeLastWord()" style="background: linear-gradient(45deg, #f39c12, #e67e22);">⬅️ حذف آخر كلمة</button>
+                    <button class="btn" onclick="clearDetection()" style="background: linear-gradient(1550deg, #14b0b8, #22c3cc, #14b0b8);"> مسح الكلمة </button>
+                    <button class="btn" onclick="clearSentence()" style="background: linear-gradient(1550deg, #14b0b8, #22c3cc, #14b0b8);"> مسح الجملة </button>
+                    <button class="btn" onclick="removeLastWord()" style="background: linear-gradient(1550deg, #14b0b8, #22c3cc, #14b0b8);"> حذف آخر كلمة </button>
                 </div>
             </div>
         </div>
@@ -363,6 +366,57 @@
     <script>
         let countdownInterval;
         let detectionCheckInterval;
+        let isDetectionActive = false;
+        
+        // Improved button state management
+        function setButtonLoading(button, isLoading) {
+            if (isLoading) {
+                button.classList.add('loading');
+                button.disabled = true;
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
+            }
+        }
+        
+        // NEW: Toggle detection function
+        function toggleDetection() {
+            const btn = document.getElementById('toggleDetectionBtn');
+            setButtonLoading(btn, true);
+            
+            fetch('/toggle_detection', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                isDetectionActive = data.detection_active;
+                updateDetectionButton();
+                updateDetection(); // Refresh the display immediately
+            })
+            .catch(error => {
+                console.error('Error toggling detection:', error);
+                alert('خطأ في تغيير حالة الكشف');
+            })
+            .finally(() => {
+                setButtonLoading(btn, false);
+            });
+        }
+        
+        // NEW: Update detection button appearance
+        function updateDetectionButton() {
+            const btn = document.getElementById('toggleDetectionBtn');
+            
+            if (isDetectionActive) {
+                btn.textContent = ' إيقاف الكشف ⏹️ ';
+                btn.classList.remove('off');
+            } else {
+                btn.textContent = ' تشغيل الكشف 🔍 ';
+                btn.classList.add('off');
+            }
+        }
         
         function updateDetection() {
             fetch('/get_detection')
@@ -370,189 +424,176 @@
                 .then(data => {
                     const display = document.getElementById('detectionDisplay');
                     const text = document.getElementById('detectionText');
-                    const status = document.getElementById('detectionStatus');
+                    const status = document.getElementById('detectionStatusText');
                     const sentenceDisplay = document.getElementById('sentenceDisplay');
                     const sentenceText = document.getElementById('sentenceText');
                     const wordCount = document.getElementById('wordCount');
-                    const cameraStatus = document.getElementById('cameraStatus');
-                    
-                    // Update camera status
-                    if (data.camera_status) {
-                        cameraStatus.textContent = '✅ الكاميرا تعمل بشكل مستمر';
-                        cameraStatus.className = 'status-indicator status-active';
-                    } else {
-                        cameraStatus.textContent = '❌ خطأ في الكاميرا';
-                        cameraStatus.className = 'status-indicator status-error';
-                    }
-                    
-                    // Update current detection
-                    if (data.detected_sign && data.detected_sign !== '') {
-                        display.classList.add('stable-detection', 'stable-pulse');
+                    const sentenceWarning = document.getElementById('sentenceWarning');
+
+                    // تحديث حالة الكشف
+                    isDetectionActive = data.detection_status;
+                    updateDetectionButton();
+
+                    // الكلمة المكتشفة
+                    if (!isDetectionActive) {
+                        display.classList.remove('stable-detection');
+                        text.textContent = 'في انتظار تشغيل الكشف';
+                        text.classList.add('no-detection');
+                        status.textContent = '';
+                        sentenceWarning.style.display = 'none';
+                    } else if (data.detected_sign && data.detected_sign !== '') {
+                        display.classList.add('stable-detection');
                         text.textContent = data.detected_sign;
                         text.classList.remove('no-detection');
-                        status.textContent = 'تم الكشف بنجاح! ✅';
-                        startCountdown();
+                        status.textContent = '';
+                        sentenceWarning.style.display = 'none';
                     } else {
-                        display.classList.remove('stable-detection', 'stable-pulse');
-                        text.textContent = 'في انتظار الكشف...';
+                        display.classList.remove('stable-detection');
+                        text.textContent = '';
                         text.classList.add('no-detection');
                         status.textContent = 'ضع يدك أمام الكاميرا';
+                        status.className = 'detection-status warning-message';
+                            if (isDetectionActive) {
+                                sentenceWarning.style.display = 'block';
+                                sentenceWarning.className = 'detection-status no-detection';
+                            } else {
+                                sentenceWarning.style.display = 'none';
+                            }
                     }
-                    
-                    // Update sentence
+
+                    // الجملة المكونة
                     if (data.sentence && data.sentence.trim() !== '') {
-                        sentenceDisplay.classList.add('stable-detection', 'stable-pulse');
+                        sentenceDisplay.classList.add('stable-detection');
                         sentenceText.textContent = data.sentence;
                         sentenceText.classList.remove('no-detection');
                         wordCount.textContent = `عدد الكلمات: ${data.word_count}`;
                     } else {
-                        sentenceDisplay.classList.remove('stable-detection', 'stable-pulse');
-                        sentenceText.textContent = 'لا توجد كلمات بعد...';
+                        sentenceDisplay.classList.remove('stable-detection');
+                        sentenceText.textContent = '';
                         sentenceText.classList.add('no-detection');
-                        wordCount.textContent = 'عدد الكلمات: 0';
+                        wordCount.textContent = '';
                     }
-                    
-                    // Update question
+
+                    // السؤال المقترح
                     if (data.question && data.question.trim() !== "") {
                         document.getElementById('questionDisplay').classList.add('stable-detection');
                         document.getElementById('questionText').textContent = data.question;
                         document.getElementById('questionText').classList.remove('no-detection');
                     } else {
                         document.getElementById('questionDisplay').classList.remove('stable-detection');
-                        document.getElementById('questionText').textContent = 'لم يتم تكوين سؤال...';
+                        document.getElementById('questionText').textContent = '';
                         document.getElementById('questionText').classList.add('no-detection');
                     }
 
-                    // Update answer
+                    // الإجابة
                     if (data.answer && data.answer.trim() !== "") {
                         document.getElementById('answerDisplay').classList.add('stable-detection');
                         document.getElementById('answerText').textContent = data.answer;
                         document.getElementById('answerText').classList.remove('no-detection');
                     } else {
                         document.getElementById('answerDisplay').classList.remove('stable-detection');
-                        document.getElementById('answerText').textContent = 'لا توجد إجابة...';
+                        document.getElementById('answerText').textContent = '';
                         document.getElementById('answerText').classList.add('no-detection');
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching detection:', error);
-                    const cameraStatus = document.getElementById('cameraStatus');
-                    cameraStatus.textContent = '❌ خطأ في الاتصال';
-                    cameraStatus.className = 'status-indicator status-error';
                 });
-        }
-        
-        function startCountdown() {
-            let seconds = 3;
-            const countdownElement = document.getElementById('countdown');
-            countdownElement.style.display = 'block';
-            
-            if (countdownInterval) {
-                clearInterval(countdownInterval);
-            }
-            
-            countdownInterval = setInterval(() => {
-                countdownElement.textContent = `الكشف التالي خلال: ${seconds} ثانية`;
-                seconds--;
-                
-                if (seconds < 0) {
-                    clearInterval(countdownInterval);
-                    countdownElement.style.display = 'none';
-                }
-            }, 1000);
         }
         
         function clearDetection() {
             const btn = event.target;
-            btn.disabled = true;
-            btn.style.opacity = '0.6';
+            setButtonLoading(btn, true);
             
             fetch('/clear_detection')
-                .then(response => response.json())
-                .then(() => {
-                    if (countdownInterval) clearInterval(countdownInterval);
-                    document.getElementById('countdown').style.display = 'none';
-                    updateDetection();
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
                 })
-                .catch(error => console.error('Error clearing detection:', error))
+                .then(data => {
+                    if (data.status === 'cleared') {
+                        if (countdownInterval) clearInterval(countdownInterval);
+                        document.getElementById('countdown').style.display = 'none';
+                        updateDetection();
+                    } else {
+                        throw new Error(data.message || 'Unknown error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error clearing detection:', error);
+                    alert('خطأ في مسح الكلمة');
+                })
                 .finally(() => {
-                    setTimeout(() => {
-                        btn.disabled = false;
-                        btn.style.opacity = '1';
-                    }, 500);
+                    setButtonLoading(btn, false);
                 });
         }
         
         function clearSentence() {
             const btn = event.target;
-            btn.disabled = true;
-            btn.style.opacity = '0.6';
+            setButtonLoading(btn, true);
             
             fetch('/clear_sentence')
-                .then(response => response.json())
-                .then(() => {
-                    if (countdownInterval) clearInterval(countdownInterval);
-                    document.getElementById('countdown').style.display = 'none';
-                    updateDetection();
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
                 })
-                .catch(error => console.error('Error clearing sentence:', error))
+                .then(data => {
+                    if (data.status === 'sentence_cleared') {
+                        if (countdownInterval) clearInterval(countdownInterval);
+                        document.getElementById('countdown').style.display = 'none';
+                        updateDetection();
+                    } else {
+                        throw new Error(data.message || 'Unknown error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error clearing sentence:', error);
+                    alert('خطأ في مسح الجملة');
+                })
                 .finally(() => {
-                    setTimeout(() => {
-                        btn.disabled = false;
-                        btn.style.opacity = '1';
-                    }, 500);
+                    setButtonLoading(btn, false);
                 });
         }
         
         function removeLastWord() {
             const btn = event.target;
-            btn.disabled = true;
-            btn.style.opacity = '0.6';
+            setButtonLoading(btn, true);
             
             fetch('/remove_last_word')
-                .then(response => response.json())
-                .then(() => updateDetection())
-                .catch(error => console.error('Error removing last word:', error))
-                .finally(() => {
-                    setTimeout(() => {
-                        btn.disabled = false;
-                        btn.style.opacity = '1';
-                    }, 500);
-                });
-        }
-        
-        function restartCamera() {
-            const btn = document.getElementById('restartCameraBtn');
-            const originalText = btn.textContent;
-            btn.textContent = '🔄 جاري...';
-            btn.disabled = true;
-            
-            fetch('/restart_camera')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'restarted') {
-                        const videoFeed = document.getElementById('videoFeed');
-                        videoFeed.src = videoFeed.src + '?' + new Date().getTime();
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
                     }
-                    updateDetection();
+                    return response.json();
                 })
-                .catch(error => console.error('Error restarting camera:', error))
+                .then(data => {
+                    if (data.status === 'word_removed' || data.status === 'no_words_to_remove') {
+                        updateDetection();
+                    } else {
+                        throw new Error(data.message || 'Unknown error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error removing last word:', error);
+                    alert('خطأ في حذف الكلمة');
+                })
                 .finally(() => {
-                    btn.textContent = originalText;
-                    btn.disabled = false;
+                    setButtonLoading(btn, false);
                 });
         }
         
         function handleCameraError() {
-            const cameraStatus = document.getElementById('cameraStatus');
-            cameraStatus.textContent = '❌ فشل في تحميل الكاميرا';
-            cameraStatus.className = 'status-indicator status-error';
+            // Camera error handling can be implemented here if needed
+            console.log('Camera error occurred');
         }
         
         function handleCameraLoad() {
-            const cameraStatus = document.getElementById('cameraStatus');
-            cameraStatus.textContent = '✅ الكاميرا تعمل بشكل مستمر';
-            cameraStatus.className = 'status-indicator status-active';
+            // Camera load handling can be implemented here if needed
+            console.log('Camera loaded successfully');
         }
         
         // Update detection every 300ms for faster response
